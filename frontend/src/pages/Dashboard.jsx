@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
+  CssBaseline,
   Drawer,
   AppBar,
   Toolbar,
@@ -22,17 +23,20 @@ import {
 } from '@mui/material';
 import {
   Menu as MenuIcon,
+  ChevronLeft as ChevronLeftIcon,
   Dashboard as DashboardIcon,
   People as PeopleIcon,
+  PersonAdd as PersonAddIcon,
   Assignment as AssignmentIcon,
-  Support as SupportIcon,
+  SupportAgent as SupportAgentIcon,
   BarChart as BarChartIcon,
-  CalendarMonth as CalendarIcon,
+  Assessment as AssessmentIcon,
   Logout as LogoutIcon,
-  AccountCircle,
+  AccountCircle as AccountCircleIcon,
 } from '@mui/icons-material';
+import { styled } from '@mui/material/styles';
 
-// Dashboard components
+// Components
 import Overview from '../components/dashboard/Overview';
 import LeadManagement from '../components/dashboard/LeadManagement';
 import ClientManagement from '../components/dashboard/ClientManagement';
@@ -40,8 +44,54 @@ import TaskManagement from '../components/dashboard/TaskManagement';
 import ServiceRequests from '../components/dashboard/ServiceRequests';
 import BusinessTracker from '../components/dashboard/BusinessTracker';
 import InvestmentReview from '../components/dashboard/InvestmentReview';
+import RoleBasedRoute from '../components/RoleBasedRoute';
+import { useAuth } from '../contexts/AuthContext';
 
 const drawerWidth = 240;
+
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginLeft: `-${drawerWidth}px`,
+    ...(open && {
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: 0,
+    }),
+  }),
+);
+
+const AppBarStyled = styled(AppBar, { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open }) => ({
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    ...(open && {
+      width: `calc(100% - ${drawerWidth}px)`,
+      marginLeft: `${drawerWidth}px`,
+      transition: theme.transitions.create(['margin', 'width'], {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    }),
+  }),
+);
+
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(0, 1),
+  ...theme.mixins.toolbar,
+  justifyContent: 'flex-end',
+}));
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -50,18 +100,10 @@ const Dashboard = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [user, setUser] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   
-  useEffect(() => {
-    // Get user from localStorage
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    } else {
-      navigate('/login');
-    }
-  }, [navigate]);
+  // Use the auth context
+  const { user, logout, hasRole } = useAuth();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -76,25 +118,29 @@ const Dashboard = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    navigate('/login');
+    logout();
   };
 
   // Navigation items based on user role
   const getNavigationItems = () => {
     const baseItems = [
       { text: 'Overview', icon: <DashboardIcon />, path: '/dashboard' },
-      { text: 'Leads', icon: <PeopleIcon />, path: '/dashboard/leads' },
+      { text: 'Leads', icon: <PersonAddIcon />, path: '/dashboard/leads' },
       { text: 'Clients', icon: <PeopleIcon />, path: '/dashboard/clients' },
       { text: 'Tasks', icon: <AssignmentIcon />, path: '/dashboard/tasks' },
-      { text: 'Service Requests', icon: <SupportIcon />, path: '/dashboard/service-requests' },
+      { text: 'Service Requests', icon: <SupportAgentIcon />, path: '/dashboard/service-requests' },
     ];
     
     // Add role-specific items
-    if (user?.role === 'top_management' || user?.role === 'business_head' || user?.role === 'rm_head') {
+    if (hasRole(['top_management', 'business_head', 'rm_head'])) {
       baseItems.push(
-        { text: 'Business Tracker', icon: <BarChartIcon />, path: '/dashboard/business-tracker' },
-        { text: 'Investment Review', icon: <CalendarIcon />, path: '/dashboard/investment-review' }
+        { text: 'Business Tracker', icon: <BarChartIcon />, path: '/dashboard/business-tracker' }
+      );
+    }
+    
+    if (hasRole(['top_management', 'business_head'])) {
+      baseItems.push(
+        { text: 'Investment Review', icon: <AssessmentIcon />, path: '/dashboard/investment-review' }
       );
     }
     
@@ -131,11 +177,12 @@ const Dashboard = () => {
   );
 
   if (!user) {
-    return null; // Or a loading spinner
+    return null; // Auth context will handle redirection
   }
 
   return (
     <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
       <AppBar
         position="fixed"
         sx={{
@@ -172,7 +219,7 @@ const Dashboard = () => {
                 color="inherit"
               >
                 <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}>
-                  {user?.name?.charAt(0) || 'U'}
+                  {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                 </Avatar>
               </IconButton>
             </Tooltip>
@@ -187,10 +234,10 @@ const Dashboard = () => {
           >
             <MenuItem>
               <ListItemIcon>
-                <AccountCircle fontSize="small" />
+                <AccountCircleIcon fontSize="small" />
               </ListItemIcon>
               <Typography variant="body2">
-                {user?.name || 'User'} ({user?.role?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())})
+                {user?.name || user?.email || 'User'} ({user?.role?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())})
               </Typography>
             </MenuItem>
             <Divider />
@@ -245,13 +292,24 @@ const Dashboard = () => {
         <Toolbar /> {/* This is for spacing below the AppBar */}
         
         <Routes>
-          <Route path="/" element={<Overview userRole={user?.role} />} />
-          <Route path="/leads" element={<LeadManagement userRole={user?.role} />} />
-          <Route path="/clients" element={<ClientManagement userRole={user?.role} />} />
-          <Route path="/tasks" element={<TaskManagement userRole={user?.role} />} />
-          <Route path="/service-requests" element={<ServiceRequests userRole={user?.role} />} />
-          <Route path="/business-tracker" element={<BusinessTracker userRole={user?.role} />} />
-          <Route path="/investment-review" element={<InvestmentReview userRole={user?.role} />} />
+          <Route path="/" element={<Overview />} />
+          <Route path="/leads" element={<LeadManagement />} />
+          <Route path="/clients" element={<ClientManagement />} />
+          <Route path="/tasks" element={<TaskManagement />} />
+          <Route path="/service-requests" element={<ServiceRequests />} />
+          
+          {/* Role-based routes */}
+          <Route path="/business-tracker" element={
+            <RoleBasedRoute requiredRoles={['top_management', 'business_head', 'rm_head']}>
+              <BusinessTracker />
+            </RoleBasedRoute>
+          } />
+          
+          <Route path="/investment-review" element={
+            <RoleBasedRoute requiredRoles={['top_management', 'business_head']}>
+              <InvestmentReview />
+            </RoleBasedRoute>
+          } />
         </Routes>
       </Box>
     </Box>

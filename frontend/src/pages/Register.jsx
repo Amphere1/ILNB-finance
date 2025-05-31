@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -19,13 +19,14 @@ import {
   Grid,
   MenuItem,
   Select,
+  Alert,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { useSnackbar } from 'notistack';
+import { useAuth } from '../contexts/AuthContext';
 
 // Validation schema
 const schema = yup.object().shape({
-  name: yup.string().required('Full name is required'),
+  username: yup.string().required('Username is required'),
   email: yup.string().email('Enter a valid email').required('Email is required'),
   password: yup
     .string()
@@ -39,15 +40,14 @@ const schema = yup.object().shape({
 });
 
 const Register = () => {
-  const navigate = useNavigate();
-  const { enqueueSnackbar } = useSnackbar();
+  const { register: registerUser, loading, error } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { control, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      name: '',
+      username: '',
       email: '',
       password: '',
       confirmPassword: '',
@@ -63,22 +63,15 @@ const Register = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
-  const onSubmit = (data) => {
-    // In a real application, this would make an API call
-    console.log('Registration data:', data);
-    
-    // For demo purposes, we'll just simulate a successful registration
-    const user = {
-      id: Math.floor(Math.random() * 1000),
-      name: data.name,
-      email: data.email,
-      role: data.role,
-    };
-    
-    localStorage.setItem('user', JSON.stringify(user));
-    
-    enqueueSnackbar('Registration successful!', { variant: 'success' });
-    navigate('/dashboard');
+  const onSubmit = async (data) => {
+    try {
+      // Remove confirmPassword as it's not needed for the API call
+      const { confirmPassword, ...userData } = data;
+      await registerUser(userData);
+    } catch (error) {
+      // Error is handled by the AuthContext
+      console.error('Registration error:', error);
+    }
   };
 
   return (
@@ -100,9 +93,15 @@ const Register = () => {
             Create Account
           </Typography>
           
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+          
           <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3 }}>
             <Controller
-              name="name"
+              name="username"
               control={control}
               render={({ field }) => (
                 <TextField
@@ -110,11 +109,11 @@ const Register = () => {
                   margin="normal"
                   required
                   fullWidth
-                  id="name"
-                  label="Full Name"
+                  id="username"
+                  label="Username"
                   autoFocus
-                  error={!!errors.name}
-                  helperText={errors.name?.message}
+                  error={!!errors.username}
+                  helperText={errors.username?.message}
                 />
               )}
             />
@@ -226,8 +225,9 @@ const Register = () => {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              disabled={loading}
             >
-              Sign Up
+              {loading ? 'Signing Up...' : 'Sign Up'}
             </Button>
             
             <Grid container justifyContent="center">

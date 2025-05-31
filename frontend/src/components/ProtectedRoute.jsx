@@ -1,24 +1,12 @@
 import { Navigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import { Box, CircularProgress } from '@mui/material';
+import { useAuth } from '../contexts/AuthContext';
 
-const ProtectedRoute = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+const ProtectedRoute = ({ children, requiredRoles }) => {
+  const { isAuthenticated, loading, hasRole } = useAuth();
 
-  useEffect(() => {
-    // In a real application, this would check with your backend
-    // For now, we'll just check localStorage
-    const checkAuth = () => {
-      const user = localStorage.getItem('user');
-      setIsAuthenticated(!!user);
-      setIsLoading(false);
-    };
-
-    checkAuth();
-  }, []);
-
-  if (isLoading) {
+  // Show loading spinner while checking authentication
+  if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress />
@@ -26,8 +14,15 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
+  // Redirect to login if not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
+  }
+
+  // Check for required roles if specified
+  if (requiredRoles && !hasRole(requiredRoles)) {
+    // Redirect to dashboard if user doesn't have the required role
+    return <Navigate to="/dashboard" />;
   }
 
   return children;

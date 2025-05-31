@@ -25,6 +25,7 @@ import {
   AccountBalance,
 } from '@mui/icons-material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Dummy data for different metrics
 const dummyData = {
@@ -117,8 +118,10 @@ const dummyData = {
   },
 };
 
-const Overview = ({ userRole }) => {
+const Overview = () => {
   const [data, setData] = useState(null);
+  const { user } = useAuth();
+  const userRole = user?.role;
 
   useEffect(() => {
     // Set data based on user role

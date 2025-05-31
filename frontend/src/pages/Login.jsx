@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -18,9 +18,10 @@ import {
   FormHelperText,
   Grid,
   Divider,
+  Alert,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { useSnackbar } from 'notistack';
+import { useAuth } from '../contexts/AuthContext';
 
 // Validation schema
 const schema = yup.object().shape({
@@ -29,8 +30,7 @@ const schema = yup.object().shape({
 });
 
 const Login = () => {
-  const navigate = useNavigate();
-  const { enqueueSnackbar } = useSnackbar();
+  const { login, loading, error } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
   const { control, handleSubmit, formState: { errors } } = useForm({
@@ -45,33 +45,13 @@ const Login = () => {
     setShowPassword(!showPassword);
   };
 
-  const onSubmit = (data) => {
-    // In a real application, this would make an API call
-    console.log('Login data:', data);
-    
-    // For demo purposes, we'll just simulate a successful login
-    // with different user roles based on email
-    let userRole = 'rm'; // Default role
-    
-    if (data.email.includes('top')) {
-      userRole = 'top_management';
-    } else if (data.email.includes('business')) {
-      userRole = 'business_head';
-    } else if (data.email.includes('rmhead')) {
-      userRole = 'rm_head';
+  const onSubmit = async (data) => {
+    try {
+      await login(data);
+    } catch (error) {
+      // Error is handled by the AuthContext
+      console.error('Login error:', error);
     }
-    
-    const user = {
-      id: Math.floor(Math.random() * 1000),
-      email: data.email,
-      name: data.email.split('@')[0],
-      role: userRole,
-    };
-    
-    localStorage.setItem('user', JSON.stringify(user));
-    
-    enqueueSnackbar('Login successful!', { variant: 'success' });
-    navigate('/dashboard');
   };
 
   return (
@@ -91,6 +71,12 @@ const Login = () => {
           <Typography component="h2" variant="h6" align="center" color="textSecondary" gutterBottom>
             Sign In
           </Typography>
+          
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
           
           <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3 }}>
             <Controller
@@ -147,8 +133,9 @@ const Login = () => {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              disabled={loading}
             >
-              Sign In
+              {loading ? 'Signing In...' : 'Sign In'}
             </Button>
             
             <Grid container justifyContent="center">
