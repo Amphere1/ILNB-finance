@@ -34,7 +34,11 @@ const userSchema = new mongoose.Schema({
     UpdatedAt:{
         type: Date,
         default: Date.now
-    }
+    },
+    managerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  }
 });
 
 
