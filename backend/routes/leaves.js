@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.post("/apply", async (req, res) => {
   try {
+    const employee = await User.findById(req.user._id);
     const leave = new LeaveRequest({ ...req.body, 
         employeeId: req.user._id,
         currentApprover: employee.managerId});

@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import authRoutes from './routes/auth.js';
 import indexRoutes from './routes/index.js';
 import leaveRoutes from './routes/leaves.js';
+import employeeRoutes from './routes/employees.js';
 import "./config/passport.js";
 import cors from 'cors';
 
@@ -24,7 +25,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api', indexRoutes);
 app.use('/api/leave', leaveRoutes);
-
+app.use("/api/employees", employeeRoutes);
 
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
