@@ -28,7 +28,10 @@ router.get("/all", async (req, res) => {
   res.json(leaves);
 });
 router.get("/pending", async (req, res) => {
-  const leaves = await LeaveRequest.find({ currentApprover: req.user._id, status: "Pending" });
+  const leaves = await LeaveRequest.find({
+    currentApprover: req.user._id,
+    status: "Pending"
+  }).populate("employeeId", "name email");
   res.json(leaves);
 });
 

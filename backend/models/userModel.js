@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-    username:{
+    name:{
         type: String,
-        required: [true, "username is required"],
+        required: [true, "name is required"],
         unique: true,
         trim: true,
         lowercase: true
@@ -38,7 +38,23 @@ const userSchema = new mongoose.Schema({
     managerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User"
-  }
+    },
+    designation: {
+        type:String,
+        required: [true, "designation is required"]
+    },
+    department: {
+        type:String,
+        required: [true, "department is required"]
+    },
+    dateOfJoining:{
+        type: Date,
+        required: [true, "date of joining is required"]
+    },
+    location:{
+        type:String,
+        required: [true,"location is required"]
+    }
 });
 
 

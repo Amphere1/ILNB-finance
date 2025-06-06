@@ -1,67 +1,13 @@
 import express from "express";
 import User from "../models/userModel.js";
+import { roleCanCreate } from "../utils/rolePermissions.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
+import crypto from 'crypto';
 
 dotenv.config();
 const router = express.Router();
-
-// User registration route
-router.post('/register', async (req, res) => {
-    try {
-        const { username, email, password, role } = req.body;
-
-        // Check if user already exists
-        const existingUser = await User.findOne({
-            $or: [{ email }, { username }]
-        });
-
-        if (existingUser) {
-            return res.status(400).json({
-                message: existingUser.email === email
-                    ? 'Email already registered'
-                    : 'Username already taken'
-            });
-        }
-
-        // Hash password
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        // Create new user
-        const user = new User({
-            username,
-            email,
-            password: hashedPassword,
-            role: role || 'rm' // Default to RM if no role specified
-        });        await user.save();
-
-        // Create and sign JWT
-        const token = jwt.sign(
-            {
-                _id: user._id,
-                username: user.username,
-                email: user.email,
-                role: user.role
-            },
-            process.env.SECRET_KEY,
-            { expiresIn: '24h' }
-        );
-
-        res.status(201).json({
-    token,
-    user: {
-        _id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role
-    }
-});
-    } catch (error) {
-    res.status(500).json({ message: error.message });
-}
-});
 
 // User login route
 router.post('/login', async (req, res) => {
@@ -86,7 +32,6 @@ router.post('/login', async (req, res) => {
         const token = jwt.sign(
             {
                 _id: user._id,
-                username: user.username,
                 email: user.email,
                 role: user.role
             },
@@ -98,9 +43,10 @@ router.post('/login', async (req, res) => {
             token,
             user: {
                 _id: user._id,
-                username: user.username,
+                username: user.name,
                 email: user.email,
-                role: user.role
+                role: user.role,
+                managerId: user.managerId
             }
         });
     } catch (error) {
@@ -132,4 +78,47 @@ router.get('/verify', async (req, res) => {
     }
 });
 
+
+router.post("/create-subordinate", async (req, res) => {
+  const creator = await User.findById(req.user._id); // logged-in manager
+  const { email, role } = req.body;
+
+ if (!roleCanCreate[creator.role]?.includes(role)) {
+  return res.status(403).json({ message: `As a ${creator.role}, you're not allowed to create a ${role}` });
+}
+   const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        message: 'Email already registered'
+      });
+    }
+
+  const rawPassword = crypto.randomBytes(4).toString("hex"); // e.g. "a3f9b2e1"
+  const hashedPassword = await bcrypt.hash(rawPassword, 10);
+
+  const user = new User({
+    ...req.body,
+    password: hashedPassword,
+    managerId: creator._id
+  });
+
+  await user.save();
+  res.status(201).json({
+    message: "User created",
+    generatedPassword: rawPassword, // Display or send via email
+    email: user.email
+  });
+});
+
+// PUT /api/users/change-password
+router.put("/change-password", async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const user = await User.findById(req.user._id);
+  const match = await bcrypt.compare(oldPassword, user.password);
+  if (!match) return res.status(401).json({ error: "Incorrect current password" });
+
+  user.password = await bcrypt.hash(newPassword, 10);
+  await user.save();
+  res.json({ message: "Password updated" });
+});
 export default router;
