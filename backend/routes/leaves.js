@@ -24,9 +24,20 @@ router.get("/my-requests", async (req, res) => {
 
 // GET /all – Admin gets all leave requests
 router.get("/all", async (req, res) => {
-  const leaves = await LeaveRequest.find().populate("employeeId", "name email");
-  res.json(leaves);
+  try {
+    const subordinates = await User.find({ managerId: req.user._id }).select("_id");
+    const subordinateIds = subordinates.map(user => user._id);
+
+    const leaves = await LeaveRequest.find({
+      employeeId: { $in: subordinateIds }
+    }).populate("employeeId", "name email");
+
+    res.json(leaves);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
+
 router.get("/pending", async (req, res) => {
   const leaves = await LeaveRequest.find({
     currentApprover: req.user._id,

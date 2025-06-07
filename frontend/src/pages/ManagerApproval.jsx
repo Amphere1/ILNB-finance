@@ -40,18 +40,7 @@ export default function ManagerLeaveApprovals() {
         ))}
       </ul>
 
-      <h2 className="text-xl font-bold mb-2">All Leave Requests</h2>
-      <ul className="space-y-2">
-        {allRequests.map((leave) => (
-          <li key={leave._id} className="border p-2 rounded">
-            <p>
-              <strong>{leave.employeeId.name}</strong> requested <b>{leave.leaveType}</b> from <b>{leave.startDate}</b> to <b>{leave.endDate}</b>
-              — Status: <b>{leave.status}</b>
-            </p>
-            {leave.approvedBy && <p>Approved by: {leave.approvedBy.name}</p>}
-          </li>
-        ))}
-      </ul>
+      
     </div>
   );
 }

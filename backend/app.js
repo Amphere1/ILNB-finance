@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
   res.send('Server is working correctly');
 });
 
-app.use('/api/auth', authRoutes);
+app.use('/api/users', authRoutes);
 app.use('/api', indexRoutes);
 app.use('/api/leave', leaveRoutes);
 app.use("/api/employees", employeeRoutes);

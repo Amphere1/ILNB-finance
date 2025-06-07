@@ -46,7 +46,14 @@ import BusinessTracker from '../components/dashboard/BusinessTracker';
 import InvestmentReview from '../components/dashboard/InvestmentReview';
 import RoleBasedRoute from '../components/RoleBasedRoute';
 import { useAuth } from '../contexts/AuthContext';
-
+import CreateSubordinateForm from './AddSubordinate';
+import LeaveHistory from './AllLeaves';
+import MyLeaveHistory from './LeaveHistory';
+import ChangePasswordForm from './ChangePass';
+import EmployeeDirectory from './Employee';
+import ApplyLeaveForm from './ApplyLeave';
+import ManagerLeaveApprovals from './ManagerApproval';
+import MyProfile from './MyProfile';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -172,6 +179,8 @@ const Dashboard = () => {
             </ListItemButton>
           </ListItem>
         ))}
+        <HrSidebarSection user={user} />
+        <MyProfile/>
       </List>
     </div>
   );
@@ -310,6 +319,16 @@ const Dashboard = () => {
               <InvestmentReview />
             </RoleBasedRoute>
           } />
+          <Route path="/apply-leave" element={<ApplyLeaveForm />} />
+          <Route path="/leave-history" element={<MyLeaveHistory />} />
+          <Route path="/all-leaves" element={<LeaveHistory />} />
+          <Route path="/approvals" element={<ManagerLeaveApprovals />} />
+          <Route path="/employees" element={<EmployeeDirectory />} />
+          <Route path="/add-subordinate" element={<CreateSubordinateForm />} />
+          <Route path="/change-password" element={<ChangePasswordForm />} />
+          <Route path="/my-profile" element={<MyProfile />} />
+          
+          {/* Fallback route */}
         </Routes>
       </Box>
     </Box>

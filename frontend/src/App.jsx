@@ -5,7 +5,6 @@ import { SnackbarProvider } from 'notistack';
 
 // Pages
 import Login from './pages/Login';
-import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import NotFound from './pages/NotFound';
 
@@ -42,7 +41,6 @@ function App() {
           <AuthProvider>
             <Routes>
               <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
               <Route path="/" element={<Navigate to="/dashboard" />} />
               <Route path="/dashboard/*" element={
                 <ProtectedRoute>
