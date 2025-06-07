@@ -131,6 +131,10 @@ export const hasRole = (roles) => {
   if (!user) return false;
   
   const userRole = user.role;
+  
+  // Top management has access to everything
+  if (userRole === 'top_management') return true;
+  
   if (Array.isArray(roles)) {
     return roles.includes(userRole);
   }

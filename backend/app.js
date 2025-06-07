@@ -4,9 +4,14 @@ import passport from "passport";
 import dotenv from "dotenv";
 import authRoutes from './routes/auth.js';
 import indexRoutes from './routes/index.js';
+import userRoutes from './routes/users.js';
+import attendanceRoutes from './routes/attendanceRoutes.js';
+import companySettingsRoutes from './routes/companySettingsRoutes.js';
 import leaveRoutes from './routes/leaves.js';
 import employeeRoutes from './routes/employees.js';
 import "./config/passport.js";
+import seedAdmin from "./config/seedAdmin.js";
+import setupCronJobs from './cronJobs.js';
 import cors from 'cors';
 
 dotenv.config();
@@ -23,6 +28,9 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/attendance', attendanceRoutes);
+app.use('/api/company-settings', companySettingsRoutes);
 app.use('/api', indexRoutes);
 app.use('/api/leave', leaveRoutes);
 app.use("/api/employees", employeeRoutes);
@@ -31,7 +39,13 @@ mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-  .then(() => console.log('Connected to MongoDB'))
+  .then(() => {
+    console.log('Connected to MongoDB');
+    // Seed admin user
+    seedAdmin();
+    // Setup cron jobs
+    setupCronJobs();
+  })
   .catch(error => console.error('MongoDB connection error:', error));
 
 const PORT = process.env.PORT || 5000;

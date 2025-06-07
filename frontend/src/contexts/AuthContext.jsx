@@ -4,7 +4,7 @@ import { useSnackbar } from 'notistack';
 import * as authService from '../services/authService';
 
 // Create context
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 // Custom hook to use the auth context
 export const useAuth = () => {
@@ -123,5 +123,3 @@ export const AuthProvider = ({ children }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
-export default AuthContext;

@@ -20,12 +20,21 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, "password is required"],
         minLength: [6, "password must be atleast 6 characters long"]
-    },
-    role: {
+    },    role: {
         type: String,
         enum: ['top_management', 'business_head', 'rm_head', 'rm'],
         default: 'rm',
         required: [true, "User role is required"]
+    },
+    manager: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: false // Optional - will be set when a manager is assigned
+    },
+    department: {
+        type: String,
+        default: 'General',
+        trim: true
     },
     CreatedAt:{
         type: Date,
