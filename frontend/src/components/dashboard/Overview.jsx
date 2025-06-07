@@ -263,7 +263,7 @@ const Overview = () => {
             <Typography component="h2" variant="h6" color="primary" gutterBottom>
               Monthly Performance
             </Typography>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="103%" height={300}>
               <BarChart
                 data={data.monthlyPerformance}
                 margin={{

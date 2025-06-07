@@ -17,8 +17,6 @@ import {
   IconButton,
   FormHelperText,
   Grid,
-  MenuItem,
-  Select,
   Alert,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -36,7 +34,6 @@ const schema = yup.object().shape({
     .string()
     .oneOf([yup.ref('password'), null], 'Passwords must match')
     .required('Confirm password is required'),
-  role: yup.string().required('Role is required'),
 });
 
 const Register = () => {
@@ -51,7 +48,6 @@ const Register = () => {
       email: '',
       password: '',
       confirmPassword: '',
-      role: '',
     },
   });
 
@@ -67,6 +63,8 @@ const Register = () => {
     try {
       // Remove confirmPassword as it's not needed for the API call
       const { confirmPassword, ...userData } = data;
+      // Assign default role of 'rm' to all new users
+      userData.role = 'rm';
       await registerUser(userData);
     } catch (error) {
       // Error is handled by the AuthContext
@@ -196,29 +194,9 @@ const Register = () => {
               )}
             />
             
-            <Controller
-              name="role"
-              control={control}
-              render={({ field }) => (
-                <FormControl variant="outlined" fullWidth margin="normal" error={!!errors.role}>
-                  <InputLabel id="role-label">Role</InputLabel>
-                  <Select
-                    {...field}
-                    labelId="role-label"
-                    id="role"
-                    label="Role"
-                  >
-                    <MenuItem value="top_management">Top Management</MenuItem>
-                    <MenuItem value="business_head">Business Head</MenuItem>
-                    <MenuItem value="rm_head">RM Head</MenuItem>
-                    <MenuItem value="rm">Relationship Manager</MenuItem>
-                  </Select>
-                  {errors.role && (
-                    <FormHelperText>{errors.role.message}</FormHelperText>
-                  )}
-                </FormControl>
-              )}
-            />
+            <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
+              By registering, you'll be assigned a basic user role. Admin approval is required for higher access levels.
+            </Typography>
             
             <Button
               type="submit"

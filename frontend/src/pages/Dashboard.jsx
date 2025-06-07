@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
@@ -20,6 +20,7 @@ import {
   Tooltip,
   useMediaQuery,
   useTheme,
+  Badge,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -33,6 +34,8 @@ import {
   Assessment as AssessmentIcon,
   Logout as LogoutIcon,
   AccountCircle as AccountCircleIcon,
+  AdminPanelSettings as AdminPanelSettingsIcon,
+  UpgradeOutlined as UpgradeIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 
@@ -44,8 +47,14 @@ import TaskManagement from '../components/dashboard/TaskManagement';
 import ServiceRequests from '../components/dashboard/ServiceRequests';
 import BusinessTracker from '../components/dashboard/BusinessTracker';
 import InvestmentReview from '../components/dashboard/InvestmentReview';
+import UserManagement from '../components/dashboard/UserManagement';
+import RoleRequest from '../components/dashboard/RoleRequest';
+import RoleRequestManagement from '../components/dashboard/RoleRequestManagement';
+import AttendanceManagement from '../pages/AttendanceManagement'; // Import AttendanceManagement
 import RoleBasedRoute from '../components/RoleBasedRoute';
 import { useAuth } from '../contexts/AuthContext';
+import * as userService from '../services/userService';
+import NotFound from './NotFound'; // Import NotFound component
 
 const drawerWidth = 240;
 
@@ -101,9 +110,31 @@ const Dashboard = () => {
   
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [pendingRoleRequests, setPendingRoleRequests] = useState(0);
   
   // Use the auth context
   const { user, logout, hasRole } = useAuth();
+
+  // Fetch pending role requests count
+  useEffect(() => {
+    const fetchPendingRoleRequests = async () => {
+      if (hasRole(['top_management'])) {
+        try {
+          const count = await userService.getPendingRoleRequestsCount();
+          setPendingRoleRequests(count);
+        } catch (error) {
+          console.error('Failed to fetch pending role requests:', error);
+        }
+      }
+    };
+
+    fetchPendingRoleRequests();
+
+    // Refresh count every 5 minutes
+    const intervalId = setInterval(fetchPendingRoleRequests, 5 * 60 * 1000);
+    
+    return () => clearInterval(intervalId);
+  }, [hasRole]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -129,6 +160,8 @@ const Dashboard = () => {
       { text: 'Clients', icon: <PeopleIcon />, path: '/dashboard/clients' },
       { text: 'Tasks', icon: <AssignmentIcon />, path: '/dashboard/tasks' },
       { text: 'Service Requests', icon: <SupportAgentIcon />, path: '/dashboard/service-requests' },
+      { text: 'Request Role Upgrade', icon: <UpgradeIcon />, path: '/dashboard/role-request' },
+      { text: 'Attendance', icon: <PeopleIcon />, path: 'attendance' }, // Changed path to relative
     ];
     
     // Add role-specific items
@@ -141,6 +174,22 @@ const Dashboard = () => {
     if (hasRole(['top_management', 'business_head'])) {
       baseItems.push(
         { text: 'Investment Review', icon: <AssessmentIcon />, path: '/dashboard/investment-review' }
+      );
+    }
+
+    // Add admin-only items
+    if (hasRole(['top_management'])) {
+      baseItems.push(
+        { text: 'User Management', icon: <AdminPanelSettingsIcon />, path: '/dashboard/user-management' },
+        { 
+          text: 'Role Requests', 
+          icon: pendingRoleRequests > 0 ? 
+            <Badge color="error" variant="dot">
+              <UpgradeIcon />
+            </Badge> : 
+            <UpgradeIcon />, 
+          path: '/dashboard/role-requests' 
+        }
       );
     }
     
@@ -297,19 +346,41 @@ const Dashboard = () => {
           <Route path="/clients" element={<ClientManagement />} />
           <Route path="/tasks" element={<TaskManagement />} />
           <Route path="/service-requests" element={<ServiceRequests />} />
-          
-          {/* Role-based routes */}
-          <Route path="/business-tracker" element={
-            <RoleBasedRoute requiredRoles={['top_management', 'business_head', 'rm_head']}>
-              <BusinessTracker />
-            </RoleBasedRoute>
-          } />
-          
-          <Route path="/investment-review" element={
-            <RoleBasedRoute requiredRoles={['top_management', 'business_head']}>
-              <InvestmentReview />
-            </RoleBasedRoute>
-          } />
+          <Route path="/role-request" element={<RoleRequest />} />
+          <Route path="attendance" element={<AttendanceManagement />} /> {/* Added AttendanceManagement route */}
+          <Route
+              path="business-tracker"
+              element={
+                <RoleBasedRoute allowedRoles={['top_management', 'business_head', 'rm_head']}>
+                    <BusinessTracker />
+                </RoleBasedRoute>
+              }
+          />
+          <Route
+              path="investment-review"
+              element={
+                <RoleBasedRoute allowedRoles={['top_management', 'business_head']}>
+                    <InvestmentReview />
+                </RoleBasedRoute>
+              }
+          />
+          <Route
+              path="user-management"
+              element={
+                <RoleBasedRoute allowedRoles={['top_management']}>
+                    <UserManagement />
+                </RoleBasedRoute>
+              }
+          />
+          <Route
+              path="role-requests"
+              element={
+                <RoleBasedRoute requiredRoles={['top_management']}>
+                    <RoleRequestManagement />
+                </RoleBasedRoute>
+              }
+          />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Box>
     </Box>
