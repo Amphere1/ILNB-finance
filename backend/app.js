@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.js';
 import indexRoutes from './routes/index.js';
 import userRoutes from './routes/users.js';
 import attendanceRoutes from './routes/attendanceRoutes.js';
+import companySettingsRoutes from './routes/companySettingsRoutes.js';
 import "./config/passport.js";
 import seedAdmin from "./config/seedAdmin.js";
 import setupCronJobs from './cronJobs.js';
@@ -27,6 +28,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/attendance', attendanceRoutes);
+app.use('/api/company-settings', companySettingsRoutes);
 app.use('/api', indexRoutes);
 
 

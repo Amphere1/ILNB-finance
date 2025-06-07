@@ -1,4 +1,5 @@
 import LocationHistory from '../models/locationHistoryModel.js';
+import { calculateDistance } from './geoUtils.js';
 
 // Thresholds for spoof detection (can be configured)
 const SPEED_THRESHOLD_KMH = 1000; // Unrealistic speed for human movement
@@ -99,7 +100,3 @@ const detectGpsSpoofing = async (userId, newLocation) => {
 };
 
 export { detectGpsSpoofing };
-
-// Note: calculateDistance is assumed to be imported or available globally. 
-// For this file, it should be imported from geoUtils.js
-import { calculateDistance } from './geoUtils.js';

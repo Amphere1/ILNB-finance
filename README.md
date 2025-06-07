@@ -15,6 +15,9 @@ A comprehensive Customer Relationship Management (CRM) system for financial serv
 - **Service Requests**: Handle client service requests
 - **Business Tracker**: Analytics for management roles
 - **Investment Review**: Investment performance tracking for higher management
+- **Attendance Management**: Track employee attendance with geolocation verification
+- **GPS Anti-Spoofing System**: Prevent location spoofing for attendance verification
+- **Office Location Management**: Configure multiple office locations with custom ranges
 
 ## Project Structure
 
@@ -54,7 +57,7 @@ This project consists of two main components:
 
 3. Install frontend dependencies:
    ```
-   cd frontend
+   cd ../frontend
    npm install
    ```
 
@@ -97,6 +100,41 @@ The application supports the following user roles in hierarchical order (highest
 2. **business_head** - Business department leadership access
 3. **rm_head** - Relationship Manager team lead access
 4. **rm** - Basic Relationship Manager access (default for new users)
+
+## Attendance System Security
+
+The attendance system uses multiple layers of security to prevent spoofing:
+
+### GPS Anti-Spoofing System
+
+The system implements several layers of protection:
+
+1. **Speed-based detection**: Detects unrealistic movement speeds between consecutive location data points
+2. **Accuracy-based detection**: Identifies suspicious GPS accuracy values (too perfect or too poor)
+3. **Teleportation detection**: Checks for impossibly fast location changes within short time periods
+
+### Office Location Management
+
+Administrators can:
+
+1. Configure multiple office locations with customizable parameters:
+   - Office name and address
+   - Precise GPS coordinates (latitude/longitude)
+   - Custom radius for valid check-ins (in meters)
+
+2. Test the anti-spoofing system with the built-in testing tool
+   - Simulates location data for verification
+   - Shows distance to nearest configured office
+   - Validates against all anti-spoofing checks
+
+### Hierarchical Access Control
+
+The attendance system implements role-based access that follows company hierarchy:
+
+- **Top Management**: Can view all attendance records
+- **Business Heads**: Can view their teams and below
+- **RM Heads**: Can only view RM records
+- **RMs**: Can only view their own attendance
 
 ## License
 

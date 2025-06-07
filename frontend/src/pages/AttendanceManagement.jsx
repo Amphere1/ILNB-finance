@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, Alert, TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import { Box, Typography, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, Alert, TextField, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem, Select, InputLabel, FormControl, Chip, Tooltip } from '@mui/material';
+import { InfoOutlined, VisibilityOff } from '@mui/icons-material';
 import attendanceService from '../services/attendanceService';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -15,7 +16,16 @@ const AttendanceManagement = () => {
     const [openRegularizeDialog, setOpenRegularizeDialog] = useState(false);
     const [selectedLoginId, setSelectedLoginId] = useState(null);
 
-    const isManager = user && (user.role === 'top_management' || user.role === 'business_head' || user.role === 'rm_head');
+    const isManager = user && (user.role === 'top_management' || user.role === 'business_head' || user.role === 'rm_head');    // Admin privileges check
+    const isAdmin = user && user.role === 'top_management';
+    
+    // Define role hierarchy for UI display and access control
+    const roleHierarchy = {
+        'top_management': { level: 4, label: 'Top Management', color: '#8c1aff' },
+        'business_head': { level: 3, label: 'Business Head', color: '#2196f3' },
+        'rm_head': { level: 2, label: 'RM Head', color: '#4caf50' },
+        'rm': { level: 1, label: 'RM', color: '#ff9800' }
+    };
 
     const fetchAttendance = async () => {
         setLoading(true);
@@ -46,12 +56,18 @@ const AttendanceManagement = () => {
             console.error('Error fetching out-of-range logins:', err);
             setError(err.response?.data?.message || 'Failed to fetch out-of-range logins.');
         }
-    };
-
-    useEffect(() => {
-        fetchAttendance();
-        fetchOutOfRangeLogins();
-    }, [currentMonth, currentYear, user]);
+    };    useEffect(() => {
+        const getAttendanceData = async () => {
+            await fetchAttendance();
+            if (isManager) {
+                await fetchOutOfRangeLogins();
+            }
+        };
+        
+        getAttendanceData();
+    // These are the only dependencies we want to trigger a refresh on
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentMonth, currentYear, user?.id]);
 
     const handleLogin = async () => {
         setLoading(true);
@@ -129,12 +145,47 @@ const AttendanceManagement = () => {
     const months = Array.from({ length: 12 }, (_, i) => i + 1);
     const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i); // Current year +/- 2
 
-    return (
-        <Box sx={{ p: 3 }}>
+    return (        <Box sx={{ p: 3 }}>
             <Typography variant="h4" gutterBottom>Attendance Management</Typography>
 
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
             {message && <Alert severity="success" sx={{ mb: 2 }}>{message}</Alert>}
+              <Paper sx={{ p: 2, mb: 3, bgcolor: 'info.light', color: 'info.contrastText' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <InfoOutlined />
+                    <Typography variant="body1">
+                        <strong>Hierarchical Access System:</strong> {isManager 
+                            ? "You can only view and manage attendance records for users at or below your role level." 
+                            : "Your attendance records can only be viewed by your managers and higher role levels."}
+                    </Typography>
+                </Box>
+                {isManager && (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                        {Object.entries(roleHierarchy)
+                            .sort((a, b) => b[1].level - a[1].level)
+                            .map(([role, details]) => (
+                                <Chip
+                                    key={role}
+                                    label={`${details.label} (Level ${details.level})`}
+                                    size="small"
+                                    sx={{ 
+                                        bgcolor: details.color,
+                                        color: 'white',
+                                        opacity: roleHierarchy[user.role].level >= details.level ? 1 : 0.5
+                                    }}
+                                />
+                            ))}
+                    </Box>
+                )}
+                <Typography variant="body2" sx={{ mt: 1 }}>                    <strong>Your role:</strong> {roleHierarchy[user.role]?.label || user.role} 
+                    {user.role !== 'top_management' && (
+                        <> - Your records are visible to: {Object.entries(roleHierarchy)
+                            .filter(entry => entry[1].level > roleHierarchy[user.role].level)
+                            .map(entry => entry[1].label)
+                            .join(', ')}</>
+                    )}
+                </Typography>
+            </Paper>
 
             <Paper sx={{ p: 3, mb: 3 }}>
                 <Typography variant="h6" gutterBottom>Daily Actions</Typography>
@@ -180,42 +231,130 @@ const AttendanceManagement = () => {
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}><CircularProgress /></Box>
                 ) : (
                     <TableContainer>
-                        <Table>
-                            <TableHead>
+                        <Table>                            <TableHead>
                                 <TableRow>
-                                    {isManager && <TableCell>Employee</TableCell>}
+                                    {isManager && (
+                                        <TableCell>
+                                            Employee 
+                                            <Tooltip title="Based on your role, you can only view detailed information for employees at or below your role level">
+                                                <InfoOutlined fontSize="small" sx={{ ml: 1, color: 'primary.main', verticalAlign: 'middle' }} />
+                                            </Tooltip>
+                                        </TableCell>
+                                    )}
                                     <TableCell>Date</TableCell>
                                     <TableCell>Login Time</TableCell>
                                     <TableCell>Logout Time</TableCell>
                                     <TableCell>Hours Worked</TableCell>
-                                    <TableCell>Out of Range</TableCell>
+                                    <TableCell>
+                                        Status
+                                        <Tooltip title="Indicates if login was out of range or late">
+                                            <InfoOutlined fontSize="small" sx={{ ml: 1, color: 'primary.main', verticalAlign: 'middle' }} />
+                                        </Tooltip>
+                                    </TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {attendanceRecords.length === 0 ? (
                                     <TableRow><TableCell colSpan={isManager ? 6 : 5} align="center">No attendance records found for this period.</TableCell></TableRow>
-                                ) : (
-                                    isManager ? (
-                                        attendanceRecords.map((userRecord) => (
-                                            userRecord.dailyRecords.map((record, index) => (
-                                                <TableRow key={`${userRecord.userId}-${record.date}-${index}`} sx={{ backgroundColor: record.isOutOfRange ? '#ffebee' : 'inherit' }}>
-                                                    <TableCell>{userRecord.username}</TableCell>
-                                                    <TableCell>{record.date}</TableCell>
-                                                    <TableCell>{record.loginTime}</TableCell>
-                                                    <TableCell>{record.logoutTime}</TableCell>
-                                                    <TableCell>{record.hoursWorked}</TableCell>
-                                                    <TableCell>{record.isOutOfRange ? 'Yes' : 'No'}</TableCell>
+                                ) : (                                    isManager ? (
+                                        attendanceRecords.map((userRecord) => {
+                                            const userRole = userRecord.role || 'rm';
+                                            const canView = user.role === 'top_management' || 
+                                                           (roleHierarchy[user.role]?.level >= roleHierarchy[userRole]?.level);
+                                            
+                                            return userRecord.dailyRecords.map((record, index) => (
+                                                <TableRow 
+                                                    key={`${userRecord.userId}-${record.date}-${index}`} 
+                                                    sx={{ 
+                                                        backgroundColor: record.isOutOfRange 
+                                                            ? '#ffebee' 
+                                                            : (record.isLate ? '#fff9c4' : 'inherit'),
+                                                        opacity: canView ? 1 : 0.5
+                                                    }}
+                                                >
+                                                    <TableCell>
+                                                        {userRecord.username}
+                                                        {userRole && (
+                                                            <Tooltip title={roleHierarchy[userRole]?.label || userRole}>
+                                                                <Chip 
+                                                                    size="small" 
+                                                                    label={userRole} 
+                                                                    sx={{ 
+                                                                        ml: 1, 
+                                                                        bgcolor: roleHierarchy[userRole]?.color || '#grey',
+                                                                        color: 'white'
+                                                                    }} 
+                                                                />
+                                                            </Tooltip>
+                                                        )}
+                                                        {!canView && (
+                                                            <Tooltip title="Limited view due to role hierarchy">
+                                                                <VisibilityOff fontSize="small" sx={{ ml: 1, color: 'text.secondary' }} />
+                                                            </Tooltip>
+                                                        )}
+                                                    </TableCell>
+                                                    <TableCell>{canView ? record.date : '***'}</TableCell>
+                                                    <TableCell>{canView ? record.loginTime : '***'}</TableCell>
+                                                    <TableCell>{canView ? record.logoutTime : '***'}</TableCell>
+                                                    <TableCell>{canView ? record.hoursWorked : '***'}</TableCell>                                                    <TableCell>
+                                                        {canView ? (
+                                                            <Box>
+                                                                {record.isOutOfRange && (
+                                                                    <Chip 
+                                                                        label="Out of Range" 
+                                                                        size="small" 
+                                                                        color="error" 
+                                                                        variant="outlined"
+                                                                        sx={{ mr: 0.5 }} 
+                                                                    />
+                                                                )}
+                                                                {record.isLate && (
+                                                                    <Chip 
+                                                                        label={`Late ${record.lateMinutes}m`} 
+                                                                        size="small" 
+                                                                        color="warning" 
+                                                                        variant="outlined" 
+                                                                    />
+                                                                )}
+                                                                {!record.isOutOfRange && !record.isLate && "OK"}
+                                                            </Box>
+                                                        ) : '***'}
+                                                    </TableCell>
                                                 </TableRow>
-                                            ))
-                                        ))
-                                    ) : (
-                                        attendanceRecords.dailyRecords?.map((record, index) => (
-                                            <TableRow key={`${record.date}-${index}`} sx={{ backgroundColor: record.isOutOfRange ? '#ffebee' : 'inherit' }}>
+                                            ));
+                                        })
+                                    ) : (                                        attendanceRecords.dailyRecords?.map((record, index) => (
+                                            <TableRow key={`${record.date}-${index}`} sx={{ 
+                                                backgroundColor: record.isOutOfRange 
+                                                    ? '#ffebee' 
+                                                    : (record.isLate ? '#fff9c4' : 'inherit')
+                                            }}>
                                                 <TableCell>{record.date}</TableCell>
                                                 <TableCell>{record.loginTime}</TableCell>
                                                 <TableCell>{record.logoutTime}</TableCell>
                                                 <TableCell>{record.hoursWorked}</TableCell>
-                                                <TableCell>{record.isOutOfRange ? 'Yes' : 'No'}</TableCell>
+                                                <TableCell>
+                                                    <Box>
+                                                        {record.isOutOfRange && (
+                                                            <Chip 
+                                                                label="Out of Range" 
+                                                                size="small" 
+                                                                color="error" 
+                                                                variant="outlined"
+                                                                sx={{ mr: 0.5 }} 
+                                                            />
+                                                        )}
+                                                        {record.isLate && (
+                                                            <Chip 
+                                                                label={`Late ${record.lateMinutes}m`} 
+                                                                size="small" 
+                                                                color="warning" 
+                                                                variant="outlined" 
+                                                            />
+                                                        )}
+                                                        {!record.isOutOfRange && !record.isLate && "OK"}
+                                                    </Box>
+                                                </TableCell>
                                             </TableRow>
                                         ))
                                     )
@@ -240,20 +379,59 @@ const AttendanceManagement = () => {
                                     <TableCell>Action</TableCell>
                                 </TableRow>
                             </TableHead>
-                            <TableBody>
-                                {outOfRangeLogins.map((login) => (
-                                    <TableRow key={login._id}>
-                                        <TableCell>{login.user.username}</TableCell>
-                                        <TableCell>{new Date(login.date).toLocaleDateString()}</TableCell>
-                                        <TableCell>{new Date(login.loginTime).toLocaleTimeString()}</TableCell>
-                                        <TableCell>{`Lat: ${login.loginLocation.latitude.toFixed(4)}, Lon: ${login.loginLocation.longitude.toFixed(4)}`}</TableCell>
-                                        <TableCell>
-                                            <Button variant="outlined" size="small" onClick={() => handleRegularizeClick(login._id)}>
-                                                Regularize
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
+                            <TableBody>                                {outOfRangeLogins.map((login) => {
+                                    const userRole = login.user.role || 'rm';
+                                    const canView = user.role === 'top_management' || 
+                                                   (roleHierarchy[user.role]?.level >= roleHierarchy[userRole]?.level);
+                                    const canRegularize = canView; // Only allow regularization if you can view
+
+                                    return (
+                                        <TableRow 
+                                            key={login._id}
+                                            sx={{ 
+                                                opacity: canView ? 1 : 0.5,
+                                                backgroundColor: !canView ? '#f5f5f5' : 'inherit'
+                                            }}
+                                        >
+                                            <TableCell>
+                                                {login.user.username}
+                                                {userRole && (
+                                                    <Tooltip title={roleHierarchy[userRole]?.label || userRole}>
+                                                        <Chip 
+                                                            size="small" 
+                                                            label={userRole}
+                                                            sx={{ 
+                                                                ml: 1, 
+                                                                bgcolor: roleHierarchy[userRole]?.color || '#grey',
+                                                                color: 'white'
+                                                            }} 
+                                                        />
+                                                    </Tooltip>
+                                                )}
+                                                {!canView && (
+                                                    <Tooltip title="Cannot view or modify due to role hierarchy">
+                                                        <InfoOutlined fontSize="small" sx={{ ml: 1, color: 'warning.main' }} />
+                                                    </Tooltip>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>{canView ? new Date(login.date).toLocaleDateString() : '***'}</TableCell>
+                                            <TableCell>{canView ? new Date(login.loginTime).toLocaleTimeString() : '***'}</TableCell>
+                                            <TableCell>
+                                                {canView ? `Lat: ${login.loginLocation.latitude.toFixed(4)}, Lon: ${login.loginLocation.longitude.toFixed(4)}` : '***'}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Button 
+                                                    variant="outlined" 
+                                                    size="small" 
+                                                    onClick={() => handleRegularizeClick(login._id)}
+                                                    disabled={!canRegularize}
+                                                >
+                                                    Regularize
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })}
                             </TableBody>
                         </Table>
                     </TableContainer>

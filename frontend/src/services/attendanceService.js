@@ -91,6 +91,17 @@ const attendanceService = {
             }
         });
         return response.data;
+    },
+    
+    // Test GPS spoofing detection with specific coordinates
+    testSpoofDetection: async (coordinates) => {
+        const token = localStorage.getItem('token');
+        const response = await axios.post(`${API_URL}/attendance/test-spoof`, coordinates, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response.data;
     }
 };
 

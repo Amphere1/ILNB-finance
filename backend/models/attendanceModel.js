@@ -31,6 +31,18 @@ const attendanceSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    isLate: {
+        type: Boolean,
+        default: false
+    },
+    lateMinutes: {
+        type: Number,
+        default: 0
+    },
+    managerReviewed: {
+        type: Boolean,
+        default: false
+    },
     date: {
         type: Date,
         required: true,

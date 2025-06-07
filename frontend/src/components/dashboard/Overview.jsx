@@ -26,6 +26,7 @@ import {
 } from '@mui/icons-material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../contexts/AuthContext';
+import NotificationsPanel from './NotificationsPanel';
 
 // Dummy data for different metrics
 const dummyData = {
@@ -148,6 +149,11 @@ const Overview = () => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
+      {/* Notifications Panel - Only for managers */}
+      {userRole && ['top_management', 'business_head', 'rm_head'].includes(userRole) && (
+        <NotificationsPanel />
+      )}
+      
       {/* Key Metrics */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} md={3}>

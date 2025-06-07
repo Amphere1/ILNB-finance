@@ -36,6 +36,8 @@ import {
   AccountCircle as AccountCircleIcon,
   AdminPanelSettings as AdminPanelSettingsIcon,
   UpgradeOutlined as UpgradeIcon,
+  Settings as SettingsIcon,
+  LocationOn as LocationOnIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 
@@ -51,6 +53,8 @@ import UserManagement from '../components/dashboard/UserManagement';
 import RoleRequest from '../components/dashboard/RoleRequest';
 import RoleRequestManagement from '../components/dashboard/RoleRequestManagement';
 import AttendanceManagement from '../pages/AttendanceManagement'; // Import AttendanceManagement
+import CompanySettings from '../components/dashboard/CompanySettings'; // Import CompanySettings
+import SpoofTester from '../components/dashboard/SpoofTester'; // Import SpoofTester
 import RoleBasedRoute from '../components/RoleBasedRoute';
 import { useAuth } from '../contexts/AuthContext';
 import * as userService from '../services/userService';
@@ -189,7 +193,9 @@ const Dashboard = () => {
             </Badge> : 
             <UpgradeIcon />, 
           path: '/dashboard/role-requests' 
-        }
+        },
+        { text: 'Company Settings', icon: <SettingsIcon />, path: '/dashboard/company-settings' },
+        { text: 'Spoof Tester', icon: <LocationOnIcon />, path: '/dashboard/spoof-tester' }
       );
     }
     
@@ -377,6 +383,22 @@ const Dashboard = () => {
               element={
                 <RoleBasedRoute requiredRoles={['top_management']}>
                     <RoleRequestManagement />
+                </RoleBasedRoute>
+              }
+          />
+          <Route
+              path="company-settings"
+              element={
+                <RoleBasedRoute allowedRoles={['top_management']}>
+                    <CompanySettings />
+                </RoleBasedRoute>
+              }
+          />
+          <Route
+              path="spoof-tester"
+              element={
+                <RoleBasedRoute allowedRoles={['top_management']}>
+                    <SpoofTester />
                 </RoleBasedRoute>
               }
           />
