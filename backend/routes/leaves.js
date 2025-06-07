@@ -30,7 +30,7 @@ router.get("/all", async (req, res) => {
 
     const leaves = await LeaveRequest.find({
       employeeId: { $in: subordinateIds }
-    }).populate("employeeId", "name email");
+    }).populate("employeeId", "username email");
 
     res.json(leaves);
   } catch (err) {
@@ -42,7 +42,7 @@ router.get("/pending", async (req, res) => {
   const leaves = await LeaveRequest.find({
     currentApprover: req.user._id,
     status: "Pending"
-  }).populate("employeeId", "name email");
+  }).populate("employeeId", "username email");
   res.json(leaves);
 });
 

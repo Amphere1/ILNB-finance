@@ -12,7 +12,7 @@ const seedAdmin = async () => {
 
     if (!exists) {
       const admin = new User({
-        name: "Admin User",
+        username: "Admin User",
         email: "admin@ilnb.co.in",
         password: await bcrypt.hash("Admin@123", 9),
         role: "top_management"

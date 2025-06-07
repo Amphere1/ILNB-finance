@@ -5,11 +5,11 @@ const router = express.Router();
 
 
 router.get("/", async (req, res) => {
-  const { name, department, location, role } = req.query;
+  const { username, department, location, role } = req.query;
   const query = {};
 
-  if (name) {
-    query.name = { $regex: name, $options: "i" }; // partial case-insensitive
+  if (username) {
+    query.username = { $regex: username, $options: "i" }; // partial case-insensitive
   }
   if (department) {
     query.department = department;
@@ -23,8 +23,8 @@ router.get("/", async (req, res) => {
 
   try {
     const employees = await User.find(query)
-      .select("name email designation department location crmRole dateOfJoining role managerId")
-      .populate("managerId", "name email");
+      .select("username email designation department location crmRole dateOfJoining role managerId")
+      .populate("managerId", "username email");
 
     res.json(employees);
   } catch (err) {

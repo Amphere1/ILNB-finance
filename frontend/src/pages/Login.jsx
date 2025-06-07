@@ -138,15 +138,7 @@ const Login = () => {
               {loading ? 'Signing In...' : 'Sign In'}
             </Button>
             
-            <Grid container justifyContent="center">
-              <Grid item>
-                <Link to="/register" style={{ textDecoration: 'none' }}>
-                  <Typography variant="body2" color="primary">
-                    Don't have an account? Sign Up
-                  </Typography>
-                </Link>
-              </Grid>
-            </Grid>
+            
             
             <Divider sx={{ my: 2 }} />
             

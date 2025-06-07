@@ -19,7 +19,7 @@ export default function ChangePasswordForm() {
       const token = localStorage.getItem("token");
 
       const res = await axios.put(
-        "/api/users/change-password",
+        "/api/auth/change-password",
         {
           oldPassword: form.oldPassword,
           newPassword: form.newPassword

@@ -3,7 +3,7 @@ import axios from "axios";
 
 export default function CreateSubordinateForm() {
   const [form, setForm] = useState({
-    name: "",
+    username: "",
     email: "",
     designation: "",
     department: "",
@@ -20,12 +20,12 @@ export default function CreateSubordinateForm() {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post("/api/users/create-subordinate", form, {
+      const res = await axios.post("/api/auth/create-subordinate", form, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setResponse(res.data);
       alert("User created. Password: " + res.data.generatedPassword);
-      setForm({ ...form, name: "", email: "" }); // reset basic fields
+      setForm({ ...form, username: "", email: "" }); // reset basic fields
     } catch (err) {
       alert("Error: " + (err.response?.data?.error || err.message));
     }
@@ -38,8 +38,8 @@ export default function CreateSubordinateForm() {
       <input
         className="border p-2 w-full"
         placeholder="Name"
-        value={form.name}
-        onChange={(e) => setForm({ ...form, name: e.target.value })}
+        value={form.username}
+        onChange={(e) => setForm({ ...form, username: e.target.value })}
         required
       />
 

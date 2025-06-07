@@ -43,7 +43,7 @@ router.post('/login', async (req, res) => {
             token,
             user: {
                 _id: user._id,
-                username: user.name,
+                username: user.username,
                 email: user.email,
                 role: user.role,
                 managerId: user.managerId
@@ -124,7 +124,7 @@ router.put("/change-password", async (req, res) => {
 
 router.get("/me", async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).populate("managerId", "name email").select("-password");
+    const user = await User.findById(req.user._id).populate("managerId", "username email").select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
     res.json(user);
   } catch (err) {

@@ -36,7 +36,7 @@ export default function LeaveHistory() {
             {leaves.map((leave) => (
               <tr key={leave._id} className="border-b">
                 <td className="border p-2">
-                  {leave.employeeId?.name} ({leave.employeeId?.email})
+                  {leave.employeeId?.username} ({leave.employeeId?.email})
                 </td>
                 <td className="border p-2">{leave.leaveType}</td>
                 <td className="border p-2">{leave.startDate.slice(0, 10)}</td>

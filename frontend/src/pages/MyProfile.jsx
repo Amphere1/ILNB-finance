@@ -8,7 +8,7 @@ export default function MyProfile() {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("/api/users/me", {
+        const res = await axios.get("/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setProfile(res.data);
@@ -29,7 +29,7 @@ export default function MyProfile() {
       <div className="bg-white shadow-md rounded p-4 space-y-4">
         <div>
           <p className="font-semibold">Name:</p>
-          <p>{profile.name}</p>
+          <p>{profile.username}</p>
         </div>
         <div>
           <p className="font-semibold">Email:</p>
