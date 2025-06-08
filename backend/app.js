@@ -22,7 +22,8 @@ const app = express();
 // Configure CORS with proper options
 const allowedOrigins = [
   'http://localhost:5173',              // Local development
-  'https://ilnb-finance.vercel.app',    // Production URL - update this to your actual domain
+  'https://ilnb-finance.vercel.app',    // Production URL
+  'https://crm-dashboard-gilt.vercel.app', // New frontend domain
   process.env.CORS_ORIGIN               // Additional origins from env
 ].filter(Boolean); // Remove undefined/null values
 
