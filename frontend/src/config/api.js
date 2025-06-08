@@ -10,9 +10,7 @@ const getApiUrl = () => {
   // Use different environment variables based on the environment
   if (isProd) {
     // Try different environment variable formats that Vercel might use
-    const prodUrl = import.meta.env.API_URL || 
-                   import.meta.env.NEXT_PUBLIC_API_URL || 
-                   'https://ilnb-finance-backend.vercel.app/api';
+    const prodUrl = import.meta.env.API_URL;
     console.log('Production API URL:', prodUrl);
     return prodUrl;
   }
