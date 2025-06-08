@@ -141,15 +141,6 @@ const Login = () => {
             
             
             <Divider sx={{ my: 2 }} />
-            
-            <Typography variant="body2" color="textSecondary" align="center">
-              Demo Accounts:<br />
-              Top Management: top@example.com<br />
-              Business Head: business@example.com<br />
-              RM Head: rmhead@example.com<br />
-              RM: rm@example.com<br />
-              (Any password will work)
-            </Typography>
           </Box>
         </Paper>
       </Box>
