@@ -24,6 +24,7 @@ const allowedOrigins = [
   'http://localhost:5173',              // Local development
   'https://ilnb-finance.vercel.app',    // Production URL
   'https://crm-dashboard-gilt.vercel.app', // New frontend domain
+  'https://ilnb-finance.onrender.com',  // Render.com backend URL
   process.env.CORS_ORIGIN               // Additional origins from env
 ].filter(Boolean); // Remove undefined/null values
 
