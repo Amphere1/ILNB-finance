@@ -39,14 +39,14 @@ const userSchema = new mongoose.Schema({
     CreatedAt:{
         type: Date,
         default: Date.now
-    },
-    UpdatedAt:{
+    },    UpdatedAt:{
         type: Date,
         default: Date.now
     },
     managerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        index: true // Add an index to improve query performance
     },
     designation: {
         type:String,

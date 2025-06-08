@@ -40,6 +40,7 @@ import {
   LocationOn as LocationOnIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import HrTopbarSection from '../components/dashboard/HrTopbarSection';
 
 // Components
 import Overview from '../components/dashboard/Overview';
@@ -209,7 +210,6 @@ const Dashboard = () => {
     
     return baseItems;
   };
-
   const drawer = (
     <div>
       <Toolbar sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
@@ -235,8 +235,6 @@ const Dashboard = () => {
             </ListItemButton>
           </ListItem>
         ))}
-        <HrSidebarSection user={user} />
-        <MyProfile/>
       </List>
     </div>
   );
@@ -264,8 +262,7 @@ const Dashboard = () => {
             sx={{ mr: 2, display: { sm: 'none' } }}
           >
             <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          </IconButton>          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {location.pathname === '/dashboard' ? 'Dashboard Overview' :
              location.pathname === '/dashboard/leads' ? 'Lead Management' :
              location.pathname === '/dashboard/clients' ? 'Client Management' :
@@ -275,7 +272,8 @@ const Dashboard = () => {
              location.pathname === '/dashboard/investment-review' ? 'Investment Review' : 'Dashboard'}
           </Typography>
           
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <HrTopbarSection user={user} />
             <Tooltip title="Account settings">
               <IconButton
                 onClick={handleProfileMenuOpen}
@@ -411,17 +409,18 @@ const Dashboard = () => {
                     <SpoofTester />
                 </RoleBasedRoute>
               }
-          />
-          <Route path="*" element={<NotFound />} />
-          <Route path="/apply-leave" element={<ApplyLeaveForm />} />
-          <Route path="/leave-history" element={<MyLeaveHistory />} />
-          <Route path="/all-leaves" element={<LeaveHistory />} />
-          <Route path="/approvals" element={<ManagerLeaveApprovals />} />
-          <Route path="/employees" element={<EmployeeDirectory />} />
-          <Route path="/add-subordinate" element={<CreateSubordinateForm />} />
-          <Route path="/change-password" element={<ChangePasswordForm />} />
-          <Route path="/my-profile" element={<MyProfile />} />
+          />          {/* HR Routes */}
+          <Route path="apply-leave" element={<ApplyLeaveForm />} />
+          <Route path="leave-history" element={<MyLeaveHistory />} />
+          <Route path="all-leaves" element={<LeaveHistory />} />
+          <Route path="approvals" element={<ManagerLeaveApprovals />} />
+          <Route path="employees" element={<EmployeeDirectory />} />
+          <Route path="add-subordinate" element={<CreateSubordinateForm />} />
+          <Route path="change-password" element={<ChangePasswordForm />} />
+          <Route path="my-profile" element={<MyProfile />} />
           
+          {/* Fallback route */}
+          <Route path="*" element={<NotFound />} />
           {/* Fallback route */}
         </Routes>
       </Box>
