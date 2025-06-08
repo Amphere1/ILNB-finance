@@ -1,13 +1,13 @@
 import axios from 'axios';
+import { API_URL } from '../config/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const API_URL = `${API_BASE_URL}/company-settings`;
+const COMPANY_SETTINGS_URL = `${API_URL}/company-settings`;
 
 // Get company settings
 const getCompanySettings = async () => {
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.get(API_URL, { 
+    const response = await axios.get(COMPANY_SETTINGS_URL, { 
       headers: {
         Authorization: `Bearer ${token}`
       }

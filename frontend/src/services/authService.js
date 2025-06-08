@@ -3,7 +3,7 @@
  * Handles API calls to the backend for login, registration, and token verification
  */
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { API_URL } from '../config/api';
 
 /**
  * Login user with email and password
