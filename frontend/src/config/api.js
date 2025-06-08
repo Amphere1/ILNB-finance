@@ -9,8 +9,12 @@ const getApiUrl = () => {
   
   // Use different environment variables based on the environment
   if (isProd) {
-    // Try different environment variable formats that Vercel might use
-    const prodUrl = import.meta.env.API_URL;
+    // In Vite, environment variables must be prefixed with VITE_
+    const prodUrl = import.meta.env.VITE_API_URL;
+    if (!prodUrl) {
+      console.warn('VITE_API_URL environment variable is not set. Using fallback URL.');
+      return 'https://ilnb-finance-backend.vercel.app/api';
+    }
     console.log('Production API URL:', prodUrl);
     return prodUrl;
   }
