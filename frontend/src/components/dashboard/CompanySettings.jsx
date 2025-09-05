@@ -60,7 +60,7 @@ const CompanySettings = () => {
       endTime.setHours(endHour, endMinute, 0);
       
       setGeneralSettings({
-        companyName: data.companyName || 'ILNB Finance',
+        companyName: data.companyName || 'CRM-DASHBOARD',
         workStartTime: startTime,
         workEndTime: endTime,
         lateThresholdMinutes: data.lateThresholdMinutes || 15,

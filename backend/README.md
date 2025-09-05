@@ -1,4 +1,4 @@
-# ILNB Finance Backend
+# CRM-DASHBOARD Backend
 
 ## Admin User Setup
 
@@ -7,7 +7,7 @@ The application automatically creates a default admin user on startup if one doe
 ### Default Admin Credentials
 
 - **Username:** admin
-- **Email:** admin@ilnbfinance.com
+- **Email:** admin@crmdashboard.com
 - **Password:** Admin@123
 - **Role:** top_management
 
@@ -63,7 +63,7 @@ PORT=5000
 MONGODB_URI=your_mongodb_connection_string
 SECRET_KEY=your_jwt_secret_key
 ADMIN_USERNAME=admin
-ADMIN_EMAIL=admin@ilnbfinance.com
+ADMIN_EMAIL=admin@crmdashboard.com
 ADMIN_PASSWORD=Admin@123
 ```
 

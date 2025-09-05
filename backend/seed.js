@@ -8,12 +8,12 @@ dotenv.config();
 const seedAdmin = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    const exists = await User.findOne({ email: "admin@ilnb.co.in" });
+    const exists = await User.findOne({ email: "admin@crmdashboard.com" });
 
     if (!exists) {
       const admin = new User({
         username: "Admin User",
-        email: "admin@ilnb.co.in",
+        email: "admin@crmdashboard.com",
         password: await bcrypt.hash("Admin@123", 9),
         role: "top_management"
       });

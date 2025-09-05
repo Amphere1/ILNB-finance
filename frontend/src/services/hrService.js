@@ -1,5 +1,5 @@
 /**
- * HR Service for ILNB Finance CRM
+ * HR Service for CRM-DASHBOARD
  * Handles API calls to the backend for HR-related operations
  */
 

@@ -1,5 +1,5 @@
 /**
- * Role-based authorization middleware for ILNB Finance CRM
+ * Role-based authorization middleware for CRM-DASHBOARD
  * This middleware checks if the authenticated user has the required role(s) to access a route
  */
 

@@ -1,5 +1,5 @@
 /**
- * User management service for ILNB Finance CRM
+ * User management service for CRM-DASHBOARD
  * Handles API calls to the backend for user management operations
  */
 

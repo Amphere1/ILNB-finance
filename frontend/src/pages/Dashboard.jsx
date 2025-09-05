@@ -214,7 +214,7 @@ const Dashboard = () => {
     <div>
       <Toolbar sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
         <Typography variant="h6" noWrap component="div">
-          ILNB Finance CRM
+          CRM-DASHBOARD
         </Typography>
       </Toolbar>
       <Divider />

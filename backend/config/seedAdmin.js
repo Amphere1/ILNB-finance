@@ -7,7 +7,7 @@ dotenv.config();
 
 // Admin credentials
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@ilnbfinance.com';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@crmdashboard.com';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin@123';
 
 // Function to seed admin user

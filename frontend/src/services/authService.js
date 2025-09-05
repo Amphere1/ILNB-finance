@@ -1,5 +1,5 @@
 /**
- * Authentication service for ILNB Finance CRM
+ * Authentication service for CRM-DASHBOARD
  * Handles API calls to the backend for login, registration, and token verification
  */
 

@@ -1,4 +1,4 @@
-# ILNB Finance CRM
+# CRM-DASHBOARD
 
 A comprehensive Customer Relationship Management (CRM) system for financial services with role-based access control.
 
@@ -67,7 +67,7 @@ This project consists of two main components:
    MONGODB_URI=your_mongodb_connection_string
    SECRET_KEY=your_jwt_secret_key
    ADMIN_USERNAME=admin
-   ADMIN_EMAIL=admin@ilnbfinance.com
+   ADMIN_EMAIL=admin@crmdashboard.com
    ADMIN_PASSWORD=Admin@123
    ```
 
@@ -87,7 +87,7 @@ This project consists of two main components:
 
 A default admin account is automatically created when the backend server starts:
 
-- **Email:** admin@ilnbfinance.com
+- **Email:** admin@crmdashboard.com
 - **Password:** Admin@123
 
 These credentials can be customized through environment variables in the backend.

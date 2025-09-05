@@ -13,7 +13,7 @@ router.get('/', verifyToken, authorize(['top_management', 'business_head']), asy
         if (!settings) {
             // Create default settings if none exist
             settings = await CompanySettings.create({
-                companyName: 'ILNB Finance',
+                companyName: 'CRM-DASHBOARD',
                 workStartTime: { hour: 9, minute: 0 },
                 workEndTime: { hour: 18, minute: 0 },
                 lateThresholdMinutes: 15,
@@ -44,7 +44,7 @@ router.put('/', verifyToken, authorize(['top_management']), async (req, res) => 
         
         if (!settings) {
             settings = new CompanySettings({
-                companyName: companyName || 'ILNB Finance',
+                companyName: companyName || 'CRM-DASHBOARD',
                 workStartTime: workStartTime || { hour: 9, minute: 0 },
                 workEndTime: workEndTime || { hour: 18, minute: 0 },
                 lateThresholdMinutes: lateThresholdMinutes || 15,
@@ -86,7 +86,7 @@ router.post('/office-locations', verifyToken, authorize(['top_management']), asy
         
         if (!settings) {
             settings = new CompanySettings({
-                companyName: 'ILNB Finance',
+                companyName: 'CRM-DASHBOARD',
                 workStartTime: { hour: 9, minute: 0 },
                 workEndTime: { hour: 18, minute: 0 },
                 lateThresholdMinutes: 15,

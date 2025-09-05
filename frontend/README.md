@@ -1,4 +1,4 @@
-# ILNB Finance Frontend
+# CRM-DASHBOARD Frontend
 
 This project is built with React and Vite, providing a modern and efficient development experience.
 
@@ -15,7 +15,7 @@ The application supports a role-based access control system with the following u
 
 A default admin account is automatically created when the backend server starts. Use these credentials to access the admin features:
 
-- **Email:** admin@ilnbfinance.com
+- **Email:** admin@crmdashboard.com
 - **Password:** Admin@123
 
 > Note: These credentials can be customized through environment variables in the backend. See the backend README for details.
